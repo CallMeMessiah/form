@@ -1,14 +1,15 @@
 import styles from "./Error.module.css";
 
 export const Error = ({ errors }) => {
+  const activeErrors = Object.values(errors).filter((err) => err?.message);
+
+  if (activeErrors.length === 0) return null; // нет ошибок — не рендерим ничего
+
   return (
     <>
-      {errors.map((error, index) => (
-        <div
-          key={index}
-          className={`${styles.errorBase} ${!error.valide ? styles.visible : ""}`}
-        >
-          {!error.valide && error.ErrorText}
+      {activeErrors.map((error, index) => (
+        <div key={index} className={`${styles.errorBase}`}>
+          {error.message}
         </div>
       ))}
     </>

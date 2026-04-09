@@ -1,59 +1,60 @@
 import styles from "./App.module.css";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Error } from "./Error";
-
-const defaultErrors = [
-  { ErrorText: "Некорректный email", valide: true },
-  {
-    ErrorText:
-      "Пароль должен содержать только латинские буквы верхнего и нижнего регистра и цифры",
-    valide: true,
-  },
-  { ErrorText: "Пароли не совпадают", valide: true },
-];
+import { useForm } from "react-hook-form";
 
 export const App = () => {
-  const email = useRef(null);
-  const password = useRef(null);
-  const confirmPassword = useRef(null);
-  const [errors, setError] = useState(defaultErrors);
-  const handleClick = () => {
-    let curErrors = [...defaultErrors];
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
     const validationEmail = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
     const validationPassword = /\d.*\w|\w.*\d/;
-    const passwordsMatch =
-      password.current.value === confirmPassword.current.value;
+    const passwordsMatch = data.password === data.confirmPassword;
 
-    // Обновляем ВСЕ поля (не только невалидные)
-    curErrors[0].valide = validationEmail.test(email.current.value);
-    curErrors[1].valide = validationPassword.test(password.current.value);
-    curErrors[2].valide = passwordsMatch;
+    if (!validationEmail.test(data.email)) {
+      setError("email", { type: "manual", message: "Некорректный email" });
+    }
 
-    setError(curErrors);
+    if (!validationPassword.test(data.password)) {
+      setError("password", {
+        type: "manual",
+        message:
+          "Пароль должен содержать только латинские буквы верхнего и нижнего регистра и цифры",
+      });
+    }
+
+    if (!passwordsMatch) {
+      setError("confirmPassword", {
+        type: "manual",
+        message: "Пароли не совпадают",
+      });
+    }
   };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <label htmlFor="email">
         <span>Email</span>
       </label>
-      <input type="email" name="email" id="email" ref={email} />
+      <input type="email" id="email" {...register("email")} />
       <label htmlFor="password">
         <span>Password</span>
       </label>
-      <input type="password" name="password" id="password" ref={password} />
+      <input type="password" id="password" {...register("password")} />
       <label htmlFor="confirmPassword">
         <span>Confirm Password</span>
       </label>
       <input
         type="password"
-        name="confirmPassword"
         id="confirmPassword"
-        ref={confirmPassword}
+        {...register("confirmPassword")}
       />
-      <button type="button" onClick={handleClick}>
-        Sign Up
-      </button>
+      <button type="submit">Sign Up</button>
       <Error errors={errors}></Error>
     </form>
   );

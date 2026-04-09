@@ -1,11 +1,6 @@
 .errorBase {
   color: #ed5748;
-  opacity: 0%;
   text-align: center;
   font-size: 25px;
-  transition: all 2s ease;
-}
-
-.visible {
-  opacity: 100%;
+  animation: fadeIn 2s ease;
 }
